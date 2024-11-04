@@ -9,12 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -39,6 +38,12 @@ public class PostController {
    }
 
    //게시글 검색
+   @GetMapping("/search")
+   public ResponseEntity<List<Post>> searchPosts(@RequestParam String keyword){
+      List<Post> posts= postService.searchPosts(keyword);
+      return ResponseEntity.ok(posts);
+   }
+
    //게시글 편집
    //게시글 삭제
 }

@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,6 +41,10 @@ public class PostService {
       return postRepository.save(post);
    }
    //게시글 검색
+   public List<Post> searchPosts(String keyword){
+      return postRepository.findByTitleContainingOrContentContaining(keyword, keyword);
+   }
+
    //게시글 편집
    //게시글 삭제
 
