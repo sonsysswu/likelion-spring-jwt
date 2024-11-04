@@ -53,6 +53,7 @@ public class PostService {
       Post post = postRepository.findByPostId(postId)
             .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found."));
 
+      //userId 체크
 
       post.setTitle(postDTO.getTitle());
       post.setContent(postDTO.getContent());
@@ -60,6 +61,16 @@ public class PostService {
 
       return postRepository.save(post);
    }
-   //게시글 삭제
 
+   //게시글 삭제
+   public void deletePost(Long postId, String userId) {
+      Post post = postRepository.findByPostId(postId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found."));
+
+      if (!post.getAuthor().getUserId().equals(userId)) {
+         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this post");
+      }
+
+      postRepository.delete(post);
+   }
 }

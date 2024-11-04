@@ -1,9 +1,13 @@
 package likelion.practice.controller;
 
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletRequest;
 import likelion.practice.dto.PostDTO;
 import likelion.practice.entity.Post;
 import likelion.practice.security.JwtTokenProvider;
 import likelion.practice.service.PostService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,10 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -22,7 +28,7 @@ public class PostController {
    private final PostService postService;
    private final JwtTokenProvider jwtTokenProvider;
    private final AuthenticationManager authenticationManager;
-
+   private static final Logger logger = LoggerFactory.getLogger(PostController.class);
    public PostController(PostService postService, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager){
       this.postService=postService;
       this.jwtTokenProvider=jwtTokenProvider;
@@ -53,5 +59,21 @@ public class PostController {
    }
 
    //게시글 삭제
+   @DeleteMapping("/{postId}")
+   public ResponseEntity<Void> deletePost(@PathVariable Long postId, HttpServletRequest request){
+//      logger.info("Received DELETE request for postId: {}, Headers: {}", postId, Collections.list(request.getHeaderNames()).stream()
+//            .map(header -> header + ": " + request.getHeader(header))
+//            .collect(Collectors.joining(", ")));
+
+      String token = jwtTokenProvider.resolveToken(request);
+      if(token == null || !jwtTokenProvider.validateToken(token)){
+         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+      }
+
+      String userId= jwtTokenProvider.getUserId(token);
+      postService.deletePost(postId, userId);
+      return ResponseEntity.noContent().build();
+   }
+
 
 }
