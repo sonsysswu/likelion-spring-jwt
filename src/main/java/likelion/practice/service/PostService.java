@@ -7,10 +7,13 @@ import likelion.practice.entity.User;
 import likelion.practice.repository.PostRepository;
 import likelion.practice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,6 +49,17 @@ public class PostService {
    }
 
    //게시글 편집
+   public Post editPost(Long postId, PostDTO postDTO){
+      Post post = postRepository.findByPostId(postId)
+            .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Post not found."));
+
+
+      post.setTitle(postDTO.getTitle());
+      post.setContent(postDTO.getContent());
+      post.setUpdatedAt(LocalDateTime.now());
+
+      return postRepository.save(post);
+   }
    //게시글 삭제
 
 }

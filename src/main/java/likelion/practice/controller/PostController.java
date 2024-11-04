@@ -7,6 +7,7 @@ import likelion.practice.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +46,12 @@ public class PostController {
    }
 
    //게시글 편집
+   @PutMapping("/{postId}")
+   public ResponseEntity<Post> editPost(@PathVariable Long postId, @RequestBody PostDTO postDTO){
+      Post post = postService.editPost(postId,postDTO);
+      return ResponseEntity.ok(post);
+   }
+
    //게시글 삭제
+
 }
