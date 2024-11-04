@@ -10,10 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
@@ -39,6 +36,14 @@ public class UserController {
       return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
    }
 
+   @GetMapping("/checkId")
+   public String checkUserId(@RequestParam UserDTO userId){
+      boolean isAvailable= userService.checkUserId(userId);
+      if(isAvailable)
+         return "사용 가능한 아이디 입니다.";
+      else return "이미 존재하는 아이디입니다.";
+   }
+
    //로그인 API
    @PostMapping("/login")
    public ResponseEntity<Map<String, String>> loginUSer(@RequestBody UserDTO userDTO){
@@ -59,5 +64,18 @@ public class UserController {
       } catch (AuthenticationException ex){
          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password.");
       }
+   }
+
+   @GetMapping("/mypage")
+   public ResponseEntity<User> getMyPage(Authentication authentication){
+      String userId= authentication.getName();
+      User user = userService.MyPage(userId);
+      return ResponseEntity.ok(user);
+   }
+
+   @PutMapping("/mypage/{userId}/edit")
+   public ResponseEntity<User> editMyPage(@PathVariable String userId, @RequestBody UserDTO userDTO){
+      User user = userService.editMyPage(userId, userDTO);
+      return ResponseEntity.ok(user);
    }
 }

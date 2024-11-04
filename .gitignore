@@ -35,4 +35,4 @@ out/
 
 ### VS Code ###
 .vscode/
-secret.yml
+src/main/resources/secret.yml

@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
     }
     //회원가입 기능
     public User registerUser(UserDTO userDTO){
-        if(userRepository.existsByUserId(userDTO.getUserId())){
+        if(userRepository.existsByUserId(userDTO.getUserId())){ //아이디 중복체크 기능
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User ID already exists.");
         }
         User user = new User();
@@ -47,7 +47,10 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
     }
-
+    //아이디 중복 체크
+    public boolean checkUserId(UserDTO userDTO){
+        return !userRepository.existsByUserId(userDTO.getUserId());
+    }
     //로그인 기능
     public User loginUser(String userId, String password){
         User user = userRepository.findByUserId(userId)
@@ -56,5 +59,25 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password.");
         }
         return user;
+    }
+
+    //마이페이지 조회 기능
+    public User MyPage(String userId){
+        return userRepository.findByUserId(userId)
+              .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found."));
+    }
+
+    //마이페이지 수정 기능
+    public User editMyPage(String userId, UserDTO userDTO){
+        // 아이디는 수정 못하게
+
+        User user = userRepository.findByUserId(userId)
+                    .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found."));
+
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setName(userDTO.getName());
+        user.setProfileImage(userDTO.getProfileImage());
+
+        return userRepository.save(user);
     }
 }
